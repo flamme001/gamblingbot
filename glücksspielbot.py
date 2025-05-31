@@ -26,6 +26,7 @@ else:
 
 intents = discord.Intents.default()
 intents.message_content = True
+intents.members = True  # Wichtig für on_member_join
 
 bot = commands.Bot(command_prefix="!", intents=intents)
 
@@ -35,8 +36,20 @@ bot = commands.Bot(command_prefix="!", intents=intents)
 async def set_welcome_channel(ctx):
     global welcome_channel_id
     welcome_channel_id = ctx.channel.id
-    await ctx.send(f"Dieser Channel ({ctx.channel.name}) ist jetzt der Willkommens-Channel!")
+    settings["welcome_channel_id"] = welcome_channel_id
+    with open(settings_file, "w") as f:
+        json.dump(settings, f)
+        await channel.send(f"✅ Dieser Channel ({ctx.channel.name}) ist jetzt der Willkommens-Channel!")
+    
 
+        
+@bot.event
+async def on_member_join(member):
+    if welcome_channel_id is not None:
+        channel = bot.get_channel(welcome_channel_id)
+        if channel:
+            await channel.send(f"🚀 {member.mention} ist gelandet!")
+            
 @bot.event
 async def on_ready():
     activity = discord.Game(name="Glücksspiel 🎰")
@@ -105,16 +118,22 @@ async def gamble(ctx):
         
         
 @bot.command()
-@commands.has_permissions(administrator=True)
 async def reset(ctx, member: discord.Member):
-            user = str(member.id)
-            if user in cooldowns:
-                del cooldowns[user]
-                with open(cooldown_file, "w") as f:
-                    json.dump(cooldowns, f)
-                await ctx.send(f"✅ Cooldown für {member.mention} wurde zurückgesetzt.")
-            else:
-                await ctx.send(f"ℹ️ {member.mention} hat keinen aktiven Cooldown.")
+    owner_role_name = "Owner"
+
+    # Prüfen, ob der Aufrufer die Rolle "Owner" hat
+    if not any(role.name == owner_role_name for role in ctx.author.roles):
+        await ctx.send("🚫 Du hast keine Berechtigung für diesen Befehl!")
+        return
+
+    user = str(member.id)
+    if user in cooldowns:
+        del cooldowns[user]
+        with open(cooldown_file, "w") as f:
+            json.dump(cooldowns, f)
+        await ctx.send(f"✅ Cooldown für {member.mention} wurde zurückgesetzt.")
+    else:
+        await ctx.send(f"ℹ️ {member.mention} hat keinen aktiven Cooldown.")
         
  
 
