@@ -67,13 +67,11 @@ async def hallo(ctx):
 
 @bot.command()
 async def hilfe(ctx):
-    hilfe_text = (
-        
-        "Schicke Kraxy 10 🌹 um mitzumachen.\n"
+    await ctx.send("Schicke Kraxy 10 🌹 um mitzumachen.\n"
         "Verwende dann den Befehl `!gamble` um teilzunehmen!\n"
-        "🎲 Du hast eine 25 % Chance 50 🌹 zu gewinnen!"
-    )
-    await ctx.send(hilfe_text)
+        "🎲 Du hast eine 25 % Chance 50 🌹 zu gewinnen!")
+    
+   
     
 
 @bot.command()   
