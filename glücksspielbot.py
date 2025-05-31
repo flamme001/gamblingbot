@@ -37,7 +37,11 @@ async def set_welcome_channel(ctx):
     welcome_channel_id = ctx.channel.id
     await ctx.send(f"Dieser Channel ({ctx.channel.name}) ist jetzt der Willkommens-Channel!")
 
-
+@bot.event
+async def on_ready():
+    activity = discord.Game(name="Glücksspiel 🎰")
+    await bot.change_presence(status=discord.Status.online, activity=activity)
+    print(f"✅ Bot ist eingeloggt als {bot.user}")
 
 
 
