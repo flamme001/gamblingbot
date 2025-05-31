@@ -11,6 +11,7 @@ load_dotenv()
 
 cooldown_file = "cooldowns.json"
 
+welcome_channel_id = None
 
 # Sicheres Laden
 if os.path.exists(cooldown_file):
@@ -27,6 +28,16 @@ intents = discord.Intents.default()
 intents.message_content = True
 
 bot = commands.Bot(command_prefix="!", intents=intents)
+
+
+@bot.command()
+@commands.has_permissions(administrator=True)
+async def set_welcome_channel(ctx):
+    global welcome_channel_id
+    welcome_channel_id = ctx.channel.id
+    await ctx.send(f"Dieser Channel ({ctx.channel.name}) ist jetzt der Willkommens-Channel!")
+
+
 
 
 
