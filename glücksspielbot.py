@@ -10,6 +10,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 cooldown_file = "cooldowns.json"
+ticket_file = "tickets.json"
 
 welcome_channel_id = None
 
@@ -23,6 +24,17 @@ if os.path.exists(cooldown_file):
         cooldowns = {}
 else:
     cooldowns = {}
+    
+# Tickets laden
+if os.path.exists(ticket_file):
+    try:
+        with open(ticket_file, "r") as f:
+            tickets = json.load(f)
+    except json.JSONDecodeError:
+        print("⚠️ Achtung: 'tickets.json' war beschädigt – wurde zurückgesetzt.")
+        tickets = {}
+else:
+    tickets = {}
 
 intents = discord.Intents.default()
 intents.message_content = True
@@ -57,81 +69,107 @@ async def on_ready():
     print(f"✅ Bot ist eingeloggt als {bot.user}")
 
 
-
+@bot.command()
+async def thomasistsueß(ctx):
+    await ctx.send("Kraxy sagt das stimmt!")
     
 @bot.command()
 async def hallo(ctx):
     await ctx.send("Hallo ihr noobs!")
     
-   
-
 @bot.command()
 async def hilfe(ctx):
-    await ctx.send("Schicke Kraxy 10 🌹 um mitzumachen.\n Verwende dann den Befehl `!gamble` um teilzunehmen!\n 🎲 Du hast eine 25 % Chance 50 🌹 zu gewinnen!")
+    await ctx.send(
+        "Du brauchst du ein Ticket von Kraxy.\n"
+        "Verwende dann den Befehl `!gamble` um teilzunehmen!\n"
+        "🎲 Der Hauptpreis ist 100 🌹!\n"
+        "`!anzahl` um deine Anzahl von Tickets zu einzusehen!"
+    )
     
-   
-    
-
-@bot.command()   
-async def gamble(ctx):
-    user = str(ctx.author.id)
-    now = time.time()
-    zehn_tage = 10 * 24 * 60 * 60
-    fuenf_tage = 5 * 24 * 60 * 60  # 5 Tage in Sekunden
-    
-    # Standard auf 10 Tage setzen
-    cooldown_zeit = zehn_tage
-    
-     # Prüfen, ob der User die Rolle "Conju von Gottheit" hat
-    role_name = "Conju von Gottheit"
-    if any(role.name == role_name for role in ctx.author.roles):
-        cooldown_zeit = 5 * 24 * 60 * 60  # 5 Tage
-    
-    
-    last_used = cooldowns.get(user, 0)
-    
-    if now - last_used < cooldown_zeit:
-        verbleibend = int(cooldown_zeit - (now - last_used))
-        tage = verbleibend // 86400
-        stunden = (verbleibend % 86400) // 3600
-        minuten = (verbleibend % 3600) // 60
-
-        await ctx.send(f"⏳ {ctx.author.mention} du kannst nur alle 10 Tage gamblen!\n Außer du hast die Rolle Conju von Gottheit, dann nur noch 5 Tage.\n Warte noch {tage} Tage, {stunden} Stunden und {minuten} Minuten.")
-        return
-    
-    cooldowns[user] = now
-
-    with open(cooldown_file, "w") as f:
-        json.dump(cooldowns, f)
-
-
-
-    # 25 % Gewinnchance
-    if random.random() < 0.25:
-        await ctx.send(f"Du hast gewonnen {ctx.author.mention}! 50 🌹 gehören dir.")
-    else:
-        await ctx.send("Das war wohl nix!")
-        
-        
 @bot.command()
-async def reset(ctx, member: discord.Member):
-    owner_role_name = "Owner"
+async def kraxy(ctx):
+    await ctx.send("Unser toller Vorsitzender!\nAußerdem der Host des Wolf Games und Clankriegs und der Sektenführer der Krawallmachersekte.\nNiemand ist so schlau wie er! ❤️")
 
-    # Prüfen, ob der Aufrufer die Rolle "Owner" hat
-    if not any(role.name == owner_role_name for role in ctx.author.roles):
-        await ctx.send("🚫 Du hast keine Berechtigung für diesen Befehl!")
+@bot.command()
+async def krawallmachersekte(ctx):
+    await ctx.send("Die beste und gefährlichste Sekte der Welt!")
+    
+    
+    
+    
+    
+    
+    
+@bot.command()
+async def ticket(ctx, member: discord.Member, menge: int):
+    # Rolle prüfen
+    if not any(role.name == "Owner" for role in ctx.author.roles):
+        await ctx.send("🚫 Du hast keine Berechtigung, Tickets zu vergeben!\nVersuchs erst gar nicht!")
         return
 
-    user = str(member.id)
-    if user in cooldowns:
-        del cooldowns[user]
-        with open(cooldown_file, "w") as f:
-            json.dump(cooldowns, f)
-        await ctx.send(f"✅ Cooldown für {member.mention} wurde zurückgesetzt.")
+    user_id = str(member.id)
+    tickets[user_id] = tickets.get(user_id, 0) + menge
+
+    # Datei speichern
+    with open(ticket_file, "w") as f:
+        json.dump(tickets, f)
+
+    await ctx.send(f"🎟️ {member.mention} hat jetzt {tickets[user_id]} Ticket(s)!")
+    
+@bot.command()
+async def gamble(ctx):
+    user_id = str(ctx.author.id)
+
+    # Ticket vorhanden?
+    if tickets.get(user_id, 0) <= 0:
+        await ctx.send(f"{ctx.author.mention} ❌ Du brauchst ein 🎟️ Ticket von Kraxy um zu gamblen!")
+        return
+
+    # 1 Ticket abziehen
+    tickets[user_id] -= 1
+    with open(ticket_file, "w") as f:
+        json.dump(tickets, f)
+
+    # Ergebnisliste – 10 % je Option
+    ergebnisse = [
+        "DAS WAR NIX!",
+        "DAS WAR NIX!",
+        "HAHA DAS WAR NIX!",
+        "DAS WAR NIX!",
+        "DAS WAR NIX!",
+        "DAS WAR NIX!",
+        "🎉 Du gewinnst 25 🌹!",
+        "🎉 Du gewinnst 50 🌹!",
+        "🎉 Du gewinnst 75 🌹!",
+        "🎉 Du gewinnst 100 🌹!",
+    ]
+
+    ergebnis = random.choice(ergebnisse)
+    await ctx.send(f"{ctx.author.mention} {ergebnis}")
+
+@bot.command()
+async def reset (ctx, member: discord.Member):
+    # rolle prüfen
+    if not any(role.name == "Owner" for role in ctx.author.roles):
+        await ctx.send("🚫 Du Frechdachs hast keine Berechtigung Tickets zurückzusetzen!")
+        return
+    
+    user_id = str(member.id)
+
+    if user_id in tickets and tickets[user_id] > 0:
+        tickets[user_id] = 0
+        with open(ticket_file, "w") as f:
+            json.dump(tickets, f)
+        await ctx.send(f"🧼 Die Tickets von {member.mention} wurden auf 0 gesetzt.")
     else:
-        await ctx.send(f"ℹ️ {member.mention} hat keinen aktiven Cooldown.")
+        await ctx.send(f"ℹ️ {member.mention} besitzt keine Tickets.")
+
+@bot.command()
+async def anzahl(ctx):
+    user_id = str(ctx.author.id)
+    anzahl_tickets = tickets.get(user_id, 0)  # Hier auf das Dictionary zugreifen!
+    await ctx.send(f"🎟️ {ctx.author.mention} du hast {anzahl_tickets} Tickets.")
         
- 
 
 
 bot.run(os.getenv("DISCORD_TOKEN"))
