@@ -85,6 +85,21 @@ async def hilfe(ctx):
         "🎲 Der Hauptpreis ist 100 🌹!\n"
         "`!anzahl` um deine Anzahl von Tickets zu einzusehen!"
     )
+
+@bot.command()
+async def commands(ctx):
+    await ctx.send(
+        "Liste der Commands:\n"
+        "`!anzahl`: Zeigt die Anzahl deiner Tickets an.\n"
+        "`!gamble`: Erlaubt dir zu gamblen und einen Preis zu gewinnen.\n"
+        "`!hilfe`: Erklärt kurz wie man am Glücksspiel teilnimmt.\n"
+        "`!reset @user`: Nur für Kraxy, erlaubt die Tickets eines Users auf 0 zu setzen.\n"
+        "`!ticket @user anzahl`: Nur für Kraxy, gibt eine beliebige Anzahl von Tickets an einen User. Die Anzahl wird ohne Klammern oder Anführungszeichen hinter @user gesetzt.\n"
+        "`!set_welcome_channel`: Setzt den Wilkommens-Channel.")
+    
+@bot.command()
+async def abed(ctx):
+    await  ctx.send("Abed ist ein sehr professioneller Conju-Spieler der leider das Wolf Game nicht gewonnen hat")
     
 @bot.command()
 async def kraxy(ctx):
@@ -93,6 +108,12 @@ async def kraxy(ctx):
 @bot.command()
 async def krawallmachersekte(ctx):
     await ctx.send("Die beste und gefährlichste Sekte der Welt!")
+    
+@bot.command()
+async def github(ctx):
+    await ctx.send("git add .\n"
+"git commit -m\n"
+"git push origin main\n")
     
     
     
