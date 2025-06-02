@@ -172,7 +172,7 @@ async def gamble(ctx):
         "🎉 Du gewinnst 20 🌹!",
         "🎉 Du gewinnst 40 🌹!",
         "🎉 Du gewinnst 60 🌹!",
-        "🎉 Du gewinnst 80 🌹!"
+        "🎉 Du gewinnst 80 🌹!",
         "🎉 Du gewinnst 100 🌹!",
     ]
 
