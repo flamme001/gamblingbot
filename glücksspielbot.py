@@ -110,10 +110,11 @@ async def krawallmachersekte(ctx):
     await ctx.send("Die beste und gefährlichste Sekte der Welt!")
     
 @bot.command()
-async def github(ctx):
-    await ctx.send("git add .\n"
-"git commit -m\n"
-"git push origin main\n")
+async def git(ctx):
+    await ctx.send(
+        "git add .\n"
+        "git commit -m \"update\"\n"
+        "git push origin main\n")
     
     
     
@@ -155,13 +156,23 @@ async def gamble(ctx):
     ergebnisse = [
         "DAS WAR NIX!",
         "DAS WAR NIX!",
-        "HAHA DAS WAR NIX!",
         "DAS WAR NIX!",
         "DAS WAR NIX!",
         "DAS WAR NIX!",
-        "🎉 Du gewinnst 25 🌹!",
-        "🎉 Du gewinnst 50 🌹!",
-        "🎉 Du gewinnst 75 🌹!",
+        "DAS WAR NIX!",
+        "DAS WAR NIX!",
+        "DAS WAR NIX!",
+        "DAS WAR NIX!",
+        "DAS WAR NIX!",
+        "DAS WAR NIX!",
+        "DAS WAR NIX!",
+        "DAS WAR NIX!",
+        "DAS WAR NIX!",
+        "DAS WAR NIX!",
+        "🎉 Du gewinnst 20 🌹!",
+        "🎉 Du gewinnst 40 🌹!",
+        "🎉 Du gewinnst 60 🌹!",
+        "🎉 Du gewinnst 80 🌹!"
         "🎉 Du gewinnst 100 🌹!",
     ]
 
