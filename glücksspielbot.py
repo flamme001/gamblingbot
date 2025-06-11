@@ -69,7 +69,33 @@ async def on_member_remove(member):
         channel = bot.get_channel(welcome_channel_id)
         if channel:
             await channel.send(f"{member.mention} hat uns verlassen! Was eine Schande!")
-            
+
+@bot.event
+async def on_member_join(member):
+    role = discord.utils.get(member.guild.roles, name="Conjuror")
+    if role:
+        await member.add_roles(role)
+        
+
+@bot.command()
+@commands.has_permissions(manage_roles=True)
+async def checkroles(ctx):
+    role = discord.utils.get(ctx.guild.roles, name="Conjuror")
+    if not role:
+        await ctx.send("❌ Die Rolle 'Conjuror' existiert nicht.")
+        return
+
+    count = 0
+    for member in ctx.guild.members:
+        if role not in member.roles and not member.bot:
+            await member.add_roles(role)
+            count += 1
+
+    await ctx.send(f"✅ Rolle 'Conjuror' wurde {count} Mitglied(ern) gegeben.")
+
+
+
+
 @bot.event
 async def on_ready():
     activity = discord.Game(name="Glücksspiel 🎰")
