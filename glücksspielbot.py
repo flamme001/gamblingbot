@@ -12,7 +12,7 @@ load_dotenv()
 cooldown_file = "cooldowns.json"
 ticket_file = "tickets.json"
 
-welcome_channel_id = None
+welcome_channel_id = 1378103577825771672
 
 # Sicheres Laden
 if os.path.exists(cooldown_file):
@@ -61,6 +61,14 @@ async def on_member_join(member):
         channel = bot.get_channel(welcome_channel_id)
         if channel:
             await channel.send(f"🚀 {member.mention} ist gelandet!")
+            
+            
+@bot.event
+async def on_member_remove(member):
+    if welcome_channel_id is not None:
+        channel = bot.get_channel(welcome_channel_id)
+        if channel:
+            await channel.send(f"{member.mention} hat uns verlassen! Was eine Schande!")
             
 @bot.event
 async def on_ready():
