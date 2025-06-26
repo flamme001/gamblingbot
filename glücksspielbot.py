@@ -57,10 +57,17 @@ async def set_welcome_channel(ctx):
         
 @bot.event
 async def on_member_join(member):
+    # Rolle vergeben
+    role = discord.utils.get(member.guild.roles, name="Conjuror")
+    if role:
+        await member.add_roles(role)
+
+    # Willkommensnachricht senden
     if welcome_channel_id is not None:
         channel = bot.get_channel(welcome_channel_id)
         if channel:
             await channel.send(f"🚀 {member.mention} ist gelandet!")
+            print(f"{member} ist beigetreten!")
             
             
 @bot.event
@@ -70,12 +77,7 @@ async def on_member_remove(member):
         if channel:
             await channel.send(f"{member.mention} hat uns verlassen! Was eine Schande!")
 
-@bot.event
-async def on_member_join(member):
-    role = discord.utils.get(member.guild.roles, name="Conjuror")
-    if role:
-        await member.add_roles(role)
-        
+
 
 @bot.command()
 @commands.has_permissions(manage_roles=True)
@@ -235,7 +237,77 @@ async def anzahl(ctx):
     user_id = str(ctx.author.id)
     anzahl_tickets = tickets.get(user_id, 0)  # Hier auf das Dictionary zugreifen!
     await ctx.send(f"🎟️ {ctx.author.mention} du hast {anzahl_tickets} Tickets.")
+    
+    
+    
+
+# farbrollen
+
+MESSAGE_ID = 1387916912071151767
+
+reaction_roles = {
+    "❤️": 1387907628151214193,  # Rot
+    "💛": 1387907877976543354,  # Gelb
+    "💚": 1387907919776976906,  # Grün
+    "💙": 1387907853292933201,  # Blau
+    "💜": 1387909339418853406,  # Lila
+    "🩷": 1387907391940591626,  # Pink
+}
         
+@bot.event
+async def on_raw_reaction_add(payload):
+    if payload.message_id != MESSAGE_ID:
+        return
 
+    guild = bot.get_guild(payload.guild_id)
+    if guild is None:
+        return
 
+    member = guild.get_member(payload.user_id)
+    if member is None or member.bot:
+        return
+
+    emoji = str(payload.emoji.name)
+    role_id = reaction_roles.get(emoji)
+    if role_id is None:
+        return
+
+    # Alle möglichen FarbroIen (zur Sicherheit)
+    color_roles = [guild.get_role(rid) for rid in reaction_roles.values()]
+    user_roles = member.roles
+
+    # Vorherige Farben entfernen
+    roles_to_remove = [r for r in user_roles if r in color_roles and r.id != role_id]
+    if roles_to_remove:
+        await member.remove_roles(*roles_to_remove, reason="Andere Farbrollen entfernt")
+
+    # Neue Rolle hinzufügen
+    new_role = guild.get_role(role_id)
+    if new_role and new_role not in user_roles:
+        await member.add_roles(new_role, reason="Neue Farbe vergeben")
+        print(f"{member.name} erhielt die Rolle {new_role.name}")
+
+@bot.event
+async def on_raw_reaction_remove(payload):
+    if payload.message_id != MESSAGE_ID:
+        return
+
+    guild = bot.get_guild(payload.guild_id)
+    if guild is None:
+        return
+
+    member = await guild.fetch_member(payload.user_id)
+    if member is None or member.bot:
+        return
+
+    emoji = str(payload.emoji.name)
+    role_id = reaction_roles.get(emoji)
+    if role_id is None:
+        return
+
+    role = guild.get_role(role_id)
+    if role and role in member.roles:
+        await member.remove_roles(role, reason="Farbe entfernt")
+        print(f"{member.name} verlor die Rolle {role.name}")
+        
 bot.run(os.getenv("DISCORD_TOKEN"))
